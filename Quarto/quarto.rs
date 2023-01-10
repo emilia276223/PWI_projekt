@@ -7,6 +7,13 @@ fn place_on_board(mut tab: [[i32;4];4], element: i32) -> [[i32; 4]; 4]
         let parts: Vec<&str> = line.split_whitespace().collect();
         let a: usize = parts[0].parse().unwrap();
         let b: usize = parts[1].parse().unwrap();
+		if tab[a][b]!=0{               
+            println!("Wybrane miejsce jest zajęte!");
+        }
+        else { //znalezienie poprawnego miejsca
+            tab[a][b]=element;
+            return tab;
+        }
     } 
 }
 
