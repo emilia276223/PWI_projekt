@@ -162,7 +162,5 @@ fn check_if_end(tab: &[[i32;4];4], player: i8) -> bool{//true - gra toczy
 }
 
 fn main(){
-//	let tab: [[i32;4];4] = [[0;4];4];//utworzenie tablicy w ktorej bedzie zapisywany stan gry
-	//jesli 0 to puste pole, w innym przypadkach odpowiednio 1*(2)*(3)*(5)*(7) zaleznie od cech elementu 
-	check_if_end_test();
+	let tab: [[i32;4];4] = [[0;4];4];//utworzenie tablicy w ktorej bedzie zapisywany stan gry
 }
