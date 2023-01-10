@@ -1,4 +1,6 @@
 //quarto
+use std::io;
+
 fn place_on_board(mut tab: [[i32;4];4], element: i32) -> [[i32; 4]; 4]
 { 
 	loop { //pętla w nieskończoność do podania niezajętego miejsca  
