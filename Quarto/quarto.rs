@@ -1,6 +1,23 @@
-// quarto
-use rand::Rng; // 0.8.5
 
+#![allow(unused)]
+#![allow(non_snake_case)]
+
+use rand::Rng; // 0.8.5
+use std::io;
+
+
+fn bot(mut tab: [[i32; 4]; 4], element: i32) -> [[i32; 4]; 4] {
+    loop {
+        let a = rand::thread_rng().gen_range(0..=3);
+        let b = rand::thread_rng().gen_range(0..=3);
+        if tab[a][b] != 0 {
+            continue;
+        } else {
+            tab[a][b] = element; //tu wstaw element
+            return tab;
+        }
+    }
+}
 
 fn print_end(player: i8){
 	println!("Wygral gracz {}", player + 1);
