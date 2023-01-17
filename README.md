@@ -1,5 +1,31 @@
-# PWI_projekt
-Projekt PWI - Quarto in Rust
+# Quarto w Rust
+Gra przypominająca "kółko i krzyżyk" w wrsji 4x4. Plansza składa się z 16 pól, gracze ustawiają na przemian po jednej z figur. Każda z nich posiada cztery charakterystyczne cechy. Wygrywa ten kto ustawi rząd z czterech figur posiadających przynjmniej jedną wspólną cechę.
 
-Uruchamianie losuj_element:
-wywołanie 'cargo build' i 'cargo run' w folderze Quarto
+
+## Wymagania
+Żeby uruchomić projekt potrzebujesz mieć zainstalowane: Rust i Cargo
+
+```bash
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+    
+## Uruchomienie lokalne
+
+Sklonuj projekt
+
+```bash
+  git clone https://github.com/emilia276223/PWI_projekt.git
+```
+
+Przejdź do katalogu projektu
+
+```bash
+  cd PWI_projekt
+```
+
+Uruchom grę
+a
+```bash
+  Cargo run
+```
+
