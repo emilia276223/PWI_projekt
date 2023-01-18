@@ -1,5 +1,5 @@
 # Quarto w Rust
-Gra przypominająca "kółko i krzyżyk" w wrsji 4x4. Plansza składa się z 16 pól, gracze ustawiają na przemian po jednej z figur. Każda z nich posiada cztery charakterystyczne cechy. Wygrywa ten kto ustawi rząd z czterech figur posiadających przynjmniej jedną wspólną cechę.
+Gra przypominająca "kółko i krzyżyk" w wrsji 4x4. Plansza składa się z 16 pól, gracze ustawiają na przemian po jednej z figur. Każda z nich posiada cztery charakterystyczne cechy. Wygrywa ten kto ustawi rząd z czterech figur posiadających przynajmniej jedną wspólną cechę.
 
 
 ## Wymagania
