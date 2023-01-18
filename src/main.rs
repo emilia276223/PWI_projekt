@@ -512,7 +512,7 @@ fn main()
                 bot(&mut tablica_bot, n as i32, &mut ustawienie_w_tablicy, &mut czy_wpisane);
                 draw_board(&ustawienie_w_tablicy, tab);
                 if check_if_end(&tablica_bot, gracz) {break;}
-                n = random_item(&mut czy_uzyty) as usize;
+                n = wczytaj_element(&mut czy_uzyty) as usize;
                 draw_board(&ustawienie_w_tablicy, tab);
             }
             else
@@ -520,7 +520,7 @@ fn main()
                 umiesc_element(n, &mut ustawienie_w_tablicy, &mut czy_wpisane, tab, &mut tablica_bot);
                 draw_board(&ustawienie_w_tablicy, tab);
                 if check_if_end(&tablica_bot, gracz) {break;}
-	    	    n = wczytaj_element(&mut czy_uzyty) as usize;
+	    	    n = random_item(&mut czy_uzyty) as usize;
                 draw_board(&ustawienie_w_tablicy, tab);
 		        refresh();
             }
