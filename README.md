@@ -29,3 +29,13 @@ Uruchom grę
   Cargo run
 ```
 
+
+
+
+## Biblioteka ncurses
+
+Żeby uruchomić projekt potrzebujesz mieć dodatkowo zainstalowaną bibliotekę ncurses
+
+```bash
+  sudo apt-get install libncurses5-dev libncursesw5-dev
+```
