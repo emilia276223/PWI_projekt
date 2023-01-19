@@ -26,7 +26,7 @@ Przejdź do katalogu projektu
 Uruchom grę
 
 ```bash
-  Cargo run
+  cargo run
 ```
 
 
