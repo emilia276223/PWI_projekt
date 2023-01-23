@@ -327,7 +327,7 @@ fn wstaw_element(n : usize, x : usize, ustawienie_w_tablicy: &mut [[i32;2]; ROZM
 
 //nic nie zmieniamy
 fn draw_board(ustawienie_w_tablicy : &[[i32;2]; ROZMIAR_PLANSZY], tab: [[[i32; ZNAKI_POZIOM]; ZNAKI_PION]; ROZMIAR_PLANSZY]) {
-	clear();
+	erase();
 	//napisanie pol
 	for k in 0..ROZMIAR_PLANSZY {
 		mvaddch(MIEJSCA_NA_INDEKSY[k][0], MIEJSCA_NA_INDEKSY[k][1] + (ZNAKI_PION as i32), /*liczba[k + 1]*/ (k + ZNAK_A as usize) as u32);
@@ -361,13 +361,15 @@ fn draw_board(ustawienie_w_tablicy : &[[i32;2]; ROZMIAR_PLANSZY], tab: [[[i32; Z
 
 //zmienione
 fn umiesc_element(n : usize, ustawienie_w_tablicy : &mut [[i32;2]; ROZMIAR_PLANSZY], czy_wpisane : &mut [i32; ROZMIAR_PLANSZY],
-	tab : [[[i32; ZNAKI_POZIOM]; ZNAKI_PION]; ROZMIAR_PLANSZY], tablica_bot : &mut [[i32; BOK_PLANSZY]; BOK_PLANSZY]) {//n - wybrany element
+	tab : [[[i32; ZNAKI_POZIOM]; ZNAKI_PION]; ROZMIAR_PLANSZY], tablica_bot : &mut [[i32; BOK_PLANSZY]; BOK_PLANSZY], player: i32) {//n - wybrany element
 	//podswietlenie wybranego elementu
 	attron(COLOR_PAIR(3));
 	mvaddch(MIEJSCA_NA_INDEKSY[n][0], MIEJSCA_NA_INDEKSY[n][1] + (ZNAKI_PION as i32), /*liczba[k + 1]*/ (n + ZNAK_A as usize) as u32);
 	attroff(COLOR_PAIR(3));
 
 	//wybranie miejsca
+	mvaddstr(49, 0, "Runda gracza ");
+  	mvaddch(49, 13, (player + '1' as i32 ) as u32);
 	mvaddstr(50,0,"Podaj, gdzie chcesz ustawic ten element");
 	let mut znak = 0;
 	znak = getch();
@@ -379,15 +381,17 @@ fn umiesc_element(n : usize, ustawienie_w_tablicy : &mut [[i32;2]; ROZMIAR_PLANS
 	}
 	else{
 		mvaddstr(51,0,"Tam juz jest wpisany inny element lub zle podane miejsce");
-		umiesc_element(n, ustawienie_w_tablicy, czy_wpisane, tab, tablica_bot);
+		umiesc_element(n, ustawienie_w_tablicy, czy_wpisane, tab, tablica_bot, player);
 	}
     // ustawienie_w_tablicy[0][0] = 3;
 	draw_board(&ustawienie_w_tablicy, tab);
 }
 
 //nic sie nie zmienia
-fn wczytaj_element(czy_uzyty : &mut [i32; ROZMIAR_PLANSZY]) -> i32 {//wybranie przez gracza jaki chce element 
+fn wczytaj_element(czy_uzyty : &mut [i32; ROZMIAR_PLANSZY], player: i32) -> i32 {//wybranie przez gracza jaki chce element 
 	//ustawienie jednego elementu
+	mvaddstr(49, 0, "Runda gracza ");
+  	mvaddch(49, 13, (player + '1' as i32 ) as u32);
 	mvaddstr(50,0,"Podaj jaki element chcesz wybrac");
 	let znak = getch();
 	//ogarnac potem zeby sie wyswietlalo
@@ -397,7 +401,7 @@ fn wczytaj_element(czy_uzyty : &mut [i32; ROZMIAR_PLANSZY]) -> i32 {//wybranie p
 		return n as i32;
 	}
 	mvaddstr(52,0,"zle wybrany element");
-	return wczytaj_element(czy_uzyty);
+	return wczytaj_element(czy_uzyty, player);
 }
 
 //bot wybiera gdzie wstawic element
@@ -478,7 +482,7 @@ fn main() {
   {
     //najpierw wybranie pierwszego elementu
     draw_board(&ustawienie_w_tablicy, tab);
-    n = wczytaj_element(&mut czy_uzyty) as usize;
+    n = wczytaj_element(&mut czy_uzyty, gracz) as usize;
     refresh();
 
     gracz = 1;
@@ -488,7 +492,7 @@ fn main() {
   	{
 	   	draw_board(&ustawienie_w_tablicy, tab);	
 	    refresh();
-	    umiesc_element(n, &mut ustawienie_w_tablicy, &mut czy_wpisane, tab, &mut tablica_bot);
+	    umiesc_element(n, &mut ustawienie_w_tablicy, &mut czy_wpisane, tab, &mut tablica_bot, gracz);
        draw_board(&ustawienie_w_tablicy, tab);
       if check_if_end(&tablica_bot) {
 		let mut sumaWolnych = 0;
@@ -508,7 +512,7 @@ fn main() {
 		else {print_end(gracz);}
 		break;
 			}
-	   	n = wczytaj_element(&mut czy_uzyty) as usize;
+	   	n = wczytaj_element(&mut czy_uzyty, gracz) as usize;
 	    refresh();
       gracz = (gracz + 1) % 2;
   	}
@@ -561,7 +565,7 @@ fn main() {
       }
       else
       {
-        umiesc_element(n, &mut ustawienie_w_tablicy, &mut czy_wpisane, tab, &mut tablica_bot);
+        umiesc_element(n, &mut ustawienie_w_tablicy, &mut czy_wpisane, tab, &mut tablica_bot, gracz);
         draw_board(&ustawienie_w_tablicy, tab);
         if check_if_end(&tablica_bot) {
 			let mut sumaWolnych = 0;
@@ -581,7 +585,7 @@ fn main() {
 			else {print_end(gracz);}
 			break;
 		}
-  	    n = wczytaj_element(&mut czy_uzyty) as usize;
+  	    n = wczytaj_element(&mut czy_uzyty, gracz) as usize;
         draw_board(&ustawienie_w_tablicy, tab);
         refresh();
       }
