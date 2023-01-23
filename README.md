@@ -3,6 +3,7 @@ Gra przypominająca "kółko i krzyżyk" w wrsji 4x4. Plansza składa się z 16 
 
 
 ## Wymagania
+
 Żeby uruchomić projekt potrzebujesz mieć zainstalowane: Rust i Cargo
 
 ```bash
@@ -31,11 +32,18 @@ Uruchom grę
 
 
 
-
 ## Biblioteka ncurses
 
 Żeby uruchomić projekt potrzebujesz mieć dodatkowo zainstalowaną bibliotekę ncurses
 
+Ubuntu Linux
+
 ```bash
   sudo apt-get install libncurses5-dev libncursesw5-dev
+```
+
+Windows
+
+```bash
+  mingw-get install ncurses
 ```
