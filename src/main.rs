@@ -1,6 +1,5 @@
 #![allow(unused)]
 #![allow(non_snake_case)]
-
 extern crate ncurses;//nie wiem jeszcze czy dziala
 use ncurses::*;
 use std::io;
@@ -138,6 +137,8 @@ const NUMERY_ELEMENTOW : [i32; ROZMIAR_PLANSZY] = [210, 105, 70, 35, 30, 15, 10,
 fn ustawienie_kolorow() {
 	initscr();
 	start_color();
+	curs_set(CURSOR_VISIBILITY :: CURSOR_INVISIBLE);
+	noecho();
 	init_pair(1, COLOR_RED, COLOR_BLACK);
   init_pair(2, COLOR_BLUE, COLOR_BLACK);
   init_pair(3, COLOR_BLACK, COLOR_WHITE);
@@ -146,30 +147,36 @@ fn ustawienie_kolorow() {
 fn print_end(player: i32) {
 	// clear();
   mvaddstr(53,100, "GRA ZAKONCZONA");
+  if(player == -1){
+	mvaddstr(53, 116, "REMIS");
+	return;
+  } 
+  else{
   mvaddstr(53, 116, "WYGRAL GRACZ");
   mvaddch(53, 130, (player + '1' as i32 ) as u32);
+  }
 }
 
 fn check_if_end_test() {
 	//wczytanie tablicy do tesu
 	let test1 = [[0,6,0,0],[0,3,0,0],[0,21,0,0],[0,210,0,0]];//4 w jednej kolumnie
 	println!("test 1: {}", check_if_end(&test1));// gdy gracz = 0
-	
+
 	let test2 = [[5,10,1,7],[0,30,0,0],[0,105,0,0],[0,0,0,14]];//4 w jednym rzedzie
 	println!("test2: {}", check_if_end(&test2));// gdy gracz = 0
-	
+
 	let test3 = [[15,5,35,6],[105,42,2,14],[1,0,0,0],[30,0,0,0]];//brak
 	println!("test 3: {}", check_if_end(&test3));// gdy gracz = 0
-	
+
 	let test4 = [[0,1,0,70],[0,0,105,0],[0,30,2,15],[5,0,0,6]];//4 na skosie "/"
 	println!("test 4: {}", check_if_end(&test4));// gdy gracz = 0
-	
+
 	let test5 = [[10,105,0,0],[21,30,2,5],[0,0,6,0],[0,0,0,70]];//4 na skosie "\"
 	println!("test 5: {}", check_if_end(&test5));// gdy gracz = 0
 }
 
 fn check_if_end(tab: &[[i32; BOK_PLANSZY]; BOK_PLANSZY]) -> bool {//true  - koniec
-	
+
 	//sprawdzam czy sa wolne miejsca
 	let mut sumaWolnych = 0;
 	for rzad in 0..BOK_PLANSZY{
@@ -179,19 +186,19 @@ fn check_if_end(tab: &[[i32; BOK_PLANSZY]; BOK_PLANSZY]) -> bool {//true  - koni
 			}
 		}
 	}
-	
+
 	if sumaWolnych == 0 {//brak wolnych miejsc
 		return true;
 	}
-	
+
 	//skoro sa jeszcze wolnie miejsca sprawdzam czy nie ma 4 takich samych w rzedzie / kolumnie / na skosach
-	
+
 	let typy = [2, 3, 5, 7];//mod wlasciwosci
 	let mut licznik = 0;
 	let mut wolneElementy = 0;
-	
+
 	//sprawdzam czy sa 4 w rzedzie
-	
+
 	for typ in typy {//dla kazdej wlasciwosci
 		for r in 0..BOK_PLANSZY { //dla kazdego rzedu
 			//sprawdzenie wlasnosci dla wszystkich elementow
@@ -212,9 +219,9 @@ fn check_if_end(tab: &[[i32; BOK_PLANSZY]; BOK_PLANSZY]) -> bool {//true  - koni
 			wolneElementy = 0;
 		}
 	}
-	
+
 	//4 w kolumnie
-	
+
 	for typ in typy {//dla kazdej wlasciwosci
 		for k in 0..BOK_PLANSZY { //dla kazdej kolumny
 			//sprawdzenie wlasnosci dla wszystkich elementow
@@ -235,7 +242,7 @@ fn check_if_end(tab: &[[i32; BOK_PLANSZY]; BOK_PLANSZY]) -> bool {//true  - koni
 		wolneElementy = 0;
 		}
 	}
-	
+
 	//sprawdzenie dla skosu "\"
 	for typ in typy {//dla kazdej wlasciwosci
 		//dla kazdej wartosci na skosie
@@ -255,7 +262,7 @@ fn check_if_end(tab: &[[i32; BOK_PLANSZY]; BOK_PLANSZY]) -> bool {//true  - koni
 		licznik = 0;
 		wolneElementy = 0;
 	}
-	
+
 	//sprawdzenie dla skosu "/"
 	for typ in typy {//dla kazdej wlasciwosci
 		//dla kazdej wartosci na skosie
@@ -275,7 +282,7 @@ fn check_if_end(tab: &[[i32; BOK_PLANSZY]; BOK_PLANSZY]) -> bool {//true  - koni
 		licznik = 0;
 		wolneElementy = 0;
 	}	
-	
+
 	return false;
 }
 
@@ -309,11 +316,11 @@ fn start() -> [[[i32; ZNAKI_POZIOM]; ZNAKI_PION]; ROZMIAR_PLANSZY]//sprawdzic cz
 fn wstaw_element(n : usize, x : usize, ustawienie_w_tablicy: &mut [[i32;2]; ROZMIAR_PLANSZY],
 	tablica_bot : &mut [[i32; BOK_PLANSZY]; BOK_PLANSZY]) {
 	// n - numer elementu, x - numer pola; wstawiamy n- ty element w x - te miejsce
-    
+
   //do wyswietlania
   ustawienie_w_tablicy[n][0] = POLA_NA_PLANSZY[x][0];
 	ustawienie_w_tablicy[n][1] = POLA_NA_PLANSZY[x][1];
-    
+
   //dla komputera
   tablica_bot[x / BOK_PLANSZY][x % BOK_PLANSZY] = NUMERY_ELEMENTOW[n];
 }
@@ -323,10 +330,10 @@ fn draw_board(ustawienie_w_tablicy : &[[i32;2]; ROZMIAR_PLANSZY], tab: [[[i32; Z
 	clear();
 	//napisanie pol
 	for k in 0..ROZMIAR_PLANSZY {
-		mvaddch(MIEJSCA_NA_INDEKSY[k][0], MIEJSCA_NA_INDEKSY[k][1] + ZNAKI_PION, /*liczba[k + 1]*/ (k + ZNAK_A) as u32);
-		mvaddch(POLA_NA_PLANSZY[k][0], POLA_NA_PLANSZY[k][1] + ZNAKI_PION, /*liczba[k + 1]*/ (k + ZNAK_A) as u32);
+		mvaddch(MIEJSCA_NA_INDEKSY[k][0], MIEJSCA_NA_INDEKSY[k][1] + (ZNAKI_PION as i32), /*liczba[k + 1]*/ (k + ZNAK_A as usize) as u32);
+		mvaddch(POLA_NA_PLANSZY[k][0], POLA_NA_PLANSZY[k][1] + (ZNAKI_PION as i32), /*liczba[k + 1]*/ (k + ZNAK_A as usize) as u32);
 	}
-	
+
 	//na czerwono
 	attron(COLOR_PAIR(1));
 	for k in 0..8 {
@@ -357,15 +364,15 @@ fn umiesc_element(n : usize, ustawienie_w_tablicy : &mut [[i32;2]; ROZMIAR_PLANS
 	tab : [[[i32; ZNAKI_POZIOM]; ZNAKI_PION]; ROZMIAR_PLANSZY], tablica_bot : &mut [[i32; BOK_PLANSZY]; BOK_PLANSZY]) {//n - wybrany element
 	//podswietlenie wybranego elementu
 	attron(COLOR_PAIR(3));
-	mvaddch(MIEJSCA_NA_INDEKSY[n][0], MIEJSCA_NA_INDEKSY[n][1] + ZNAKI_PION, /*liczba[k + 1]*/ (n + ZNAK_A) as u32);
+	mvaddch(MIEJSCA_NA_INDEKSY[n][0], MIEJSCA_NA_INDEKSY[n][1] + (ZNAKI_PION as i32), /*liczba[k + 1]*/ (n + ZNAK_A as usize) as u32);
 	attroff(COLOR_PAIR(3));
-	
+
 	//wybranie miejsca
 	mvaddstr(50,0,"Podaj, gdzie chcesz ustawic ten element");
 	let mut znak = 0;
 	znak = getch();
 	let mut x = znak - ZNAK_A as i32;
-	if x >= 0 && x < ROZMIAR_PLANSZY && czy_wpisane[x as usize] == 0
+	if x >= 0 && x < ROZMIAR_PLANSZY as i32 && czy_wpisane[x as usize] == 0
     {
 		czy_wpisane[x as usize] = 1;
 		wstaw_element(n,x as usize, ustawienie_w_tablicy, tablica_bot);//czy nie musi byc &mut
@@ -381,10 +388,11 @@ fn umiesc_element(n : usize, ustawienie_w_tablicy : &mut [[i32;2]; ROZMIAR_PLANS
 //nic sie nie zmienia
 fn wczytaj_element(czy_uzyty : &mut [i32; ROZMIAR_PLANSZY]) -> i32 {//wybranie przez gracza jaki chce element 
 	//ustawienie jednego elementu
+	mvaddstr(50,0,"Podaj jaki element chcesz wybrac");
 	let znak = getch();
 	//ogarnac potem zeby sie wyswietlalo
 	let n = znak - ZNAK_A as i32;
-	if n >= 0 && n < ROZMIAR_PLANSZY && czy_uzyty[n as usize] == 0{
+	if n >= 0 && n < ROZMIAR_PLANSZY as i32 && czy_uzyty[n as usize] == 0{
 		czy_uzyty[n as usize] = 1;
 		return n as i32;
 	}
@@ -395,34 +403,34 @@ fn wczytaj_element(czy_uzyty : &mut [i32; ROZMIAR_PLANSZY]) -> i32 {//wybranie p
 //bot wybiera gdzie wstawic element
 fn bot(tablica_bot: &mut [[i32; BOK_PLANSZY]; BOK_PLANSZY], element: i32, ustawienie_w_tablicy: &mut [[i32;2]; ROZMIAR_PLANSZY], czy_wpisane: &mut [i32; ROZMIAR_PLANSZY]) {
 	// sprawdzenie czy bot ma ruch konczacy
-	let a: i32 = -1;
+	let mut a: i32 = -1;
 	let mut tablica_test : [[i32; BOK_PLANSZY]; BOK_PLANSZY] = [[0; BOK_PLANSZY]; BOK_PLANSZY];
 
 	for i in 0..ROZMIAR_PLANSZY {
-		tablica_test[i] = tablica_bot[i];
+		tablica_test[i/4][i%4] = tablica_bot[i/4][i%4];
 	}
 
 	for i in 0..ROZMIAR_PLANSZY {
 		if czy_wpisane[i as usize] == 0 {
-			tablica_test[i] = element;
+			tablica_test[i/4][i%4] = element;
 			if (check_if_end(&tablica_test)) {
-				a = i;
+				a = i as i32;
 				break;
 			} else {
-				tablica_test[i] = 0;
+				tablica_test[i/4][i%4] = 0;
 			}
 		}
 	}
 	// w przeciwnym wypadku losujemy pole
 	if a == -1 {
 		loop {
-  	  a = rand::thread_rng().gen_range(0..=ROZMIAR_PLANSZY-1);
+  	  a = rand::thread_rng().gen_range(0..=(ROZMIAR_PLANSZY as i32)-1);
     	if czy_wpisane[a as usize] == 0 {
-      	return;
+      	break;
     	} 
   	}
 	}
-	wstaw_element(element as usize, a, ustawienie_w_tablicy, tablica_bot);
+	wstaw_element(element as usize, a as usize, ustawienie_w_tablicy, tablica_bot);
 	czy_wpisane[a as usize] = 1;
 }
 
@@ -451,7 +459,7 @@ fn main() {
 
 	ustawienie_kolorow();
   // curs_set(1);//tum sie zajmiemy pozniej
-	
+
   //wybranie czy gra z graczem, czy z botem
   let mut tryb_gry = -1;
   loop
@@ -465,7 +473,7 @@ fn main() {
 
   let mut n;//ktory element w tym momencie wstawiamy
   let mut gracz = 0;//czyja teraz kolej (gdy gra z botem to bot = 0, gacz = 1);
-    
+
   if tryb_gry == GRA_Z_GRACZEM //z gaczem
   {
     //najpierw wybranie pierwszego elementu
@@ -483,15 +491,32 @@ fn main() {
 	    umiesc_element(n, &mut ustawienie_w_tablicy, &mut czy_wpisane, tab, &mut tablica_bot);
        draw_board(&ustawienie_w_tablicy, tab);
       if check_if_end(&tablica_bot) {
-				print_end(gracz);
-				break;
+		let mut sumaWolnych = 0;
+		for rzad in 0..BOK_PLANSZY
+		{
+			for kolumna in 0..BOK_PLANSZY
+			{
+				if tablica_bot[rzad][kolumna] == 0 {//
+					sumaWolnych += 1;//licze sume wolnych miejsc
+				}
+			}
+		}
+	
+		if sumaWolnych == 0 {//brak wolnych miejsc
+			print_end(-1);
+		}
+		else {print_end(gracz);}
+		break;
 			}
 	   	n = wczytaj_element(&mut czy_uzyty) as usize;
 	    refresh();
       gracz = (gracz + 1) % 2;
   	}
 
-    getch();
+	let mut z : i32;
+	z = getch();
+    while(z != '\n' as i32) {z = getch();}
+	
 	  endwin();
     return;
   }
@@ -514,8 +539,22 @@ fn main() {
         bot(&mut tablica_bot, n as i32, &mut ustawienie_w_tablicy, &mut czy_wpisane);
         draw_board(&ustawienie_w_tablicy, tab);
         if check_if_end(&tablica_bot) {
-					print_end(gracz);
-					break;
+			let mut sumaWolnych = 0;
+			for rzad in 0..BOK_PLANSZY
+			{
+				for kolumna in 0..BOK_PLANSZY
+				{
+					if tablica_bot[rzad][kolumna] == 0 {//
+						sumaWolnych += 1;//licze sume wolnych miejsc
+					}
+				}
+			}
+		
+			if sumaWolnych == 0 {//brak wolnych miejsc
+				print_end(-1);
+			}
+			else {print_end(gracz);}
+			break;
 				}
         n = random_item(&mut czy_uzyty) as usize;
         draw_board(&ustawienie_w_tablicy, tab);
@@ -525,9 +564,23 @@ fn main() {
         umiesc_element(n, &mut ustawienie_w_tablicy, &mut czy_wpisane, tab, &mut tablica_bot);
         draw_board(&ustawienie_w_tablicy, tab);
         if check_if_end(&tablica_bot) {
-					print_end(gracz);
-					break;
+			let mut sumaWolnych = 0;
+			for rzad in 0..BOK_PLANSZY
+			{
+				for kolumna in 0..BOK_PLANSZY
+				{
+					if tablica_bot[rzad][kolumna] == 0 {//
+						sumaWolnych += 1;//licze sume wolnych miejsc
+					}
 				}
+			}
+		
+			if sumaWolnych == 0 {//brak wolnych miejsc
+				print_end(-1);
+			}
+			else {print_end(gracz);}
+			break;
+		}
   	    n = wczytaj_element(&mut czy_uzyty) as usize;
         draw_board(&ustawienie_w_tablicy, tab);
         refresh();
